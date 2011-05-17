@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<fxpProperties abbreviated="false" authoringTool="Flex Builder" compiles="true" parentProject="a968d684-edc9-4cb8-8c75-30f06a400a1b" projectUUID="a968d684-edc9-4cb8-8c75-30f06a400a1b" pureCatalystProject="false" sdkVersion="4.5.0" uuid="eb84d80f-0cb8-4949-ac30-de5b91ff326d" version="15">
+  <projects/>
+  <src/>
+  <swc>
+    <linked location="sdkPlaceHolder" path="sdkPlaceHolder" position="0" uuid="eb84d80f-0cb8-4949-ac30-de5b91ff326d"/>
+    <linked location="C:/Users/Raymond/Adobe Flash Builder 4.5/INeedIt/libs" path="/libs" position="1" uuid="eb84d80f-0cb8-4949-ac30-de5b91ff326d"/>
+    <linked location="C:/Users/Raymond/Adobe Flash Builder 4.5/INeedIt/libs/as3corelib.swc" path="/libs/as3corelib.swc" position="2" uuid="eb84d80f-0cb8-4949-ac30-de5b91ff326d"/>
+  </swc>
+  <misc/>
+  <theme/>
+  <mxmlFormattingPrefs groupAttributesByState="true" maxLineWidth="100" mxmlAlignAttributes="true" mxmlAttributeOrder="id,userLabel,includeIn,excludeFrom,visible,x,y,z,left,right,top,bottom,width,height,minWidth,minHeight,maxWidth,maxHeight,label" mxmlKeepAttributeValuesOrganized="true"/>
+</fxpProperties>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" title="{typeLabel}" viewActivate="init(event)">
+	<fx:Script>
+	<![CDATA[
+		import mx.rpc.AsyncToken;
+		import mx.rpc.events.ResultEvent;
+		import mx.rpc.events.FaultEvent;
+		import spark.events.ViewNavigatorEvent;
+		import com.adobe.serialization.json.JSON;
+		import mx.collections.ArrayCollection;
+		
+		[Bindable] private var typeLabel:String = "";
+		private var type:String = "";
+		private var apiKey:String = "AIzaSyBmTswgqdK5l2WmFk7PdbLl5-E8pJ1XgMM";
+		
+		private function goBack(event:MouseEvent):void {
+			navigator.popView();
+		}
+		
+		private function init(event:ViewNavigatorEvent):void {
+			typeLabel = data.selected.label;		
+			type = data.selected.id;
+			//hard coded accuracy for now
+			statusLabel.text = "Loading results....";
+			getPlaceResults(data.lat,data.lng,1000);
+		}
+		
+		private function getPlaceResults(lat:Number,long:Number,accuracy:Number):void {
+			var url:String = "https://maps.googleapis.com/maps/api/place/search/json?";
+			url += "location="+lat+","+long+"&radius="+accuracy+"&types=" + type + "&key=" + apiKey + "&sensor=true";
+			trace(url);
+			httpService.url = url;
+			var async:AsyncToken = httpService.send();
+			async.resultHandler = placesResult;
+			async.faultHandler = faultResult;
+		}
+
+		private function placesResult(event:ResultEvent):void {
+			var resultData:Object = JSON.decode(event.result.toString());
+			trace("Status="+resultData.status);
+			if(resultData.status == "OK") {
+				trace("Result count="+resultData.results.length);
+				var results:ArrayCollection = new ArrayCollection(resultData.results);
+				currentState = "normal";
+				resultList.dataProvider = results;
+			} else if(resultData.status == "ZERO_RESULTS") {
+				currentState = "zeroresults";
+				statusLabel.text = "Sorry, nothing was found.";
+			}
+			
+		}
+		
+		private function faultResult(event:FaultEvent):void {
+			trace("WTF?");
+			statusLabel.text = "Sorry, we were unable to connect.";
+		}
+
+		private function loadResult(e:Event):void {
+			navigator.pushView(PlaceResult,{selected:resultList.selectedItem});		
+		}
+	]]>
+	</fx:Script>
+	<fx:Declarations>
+		<s:HTTPService id="httpService" result="event.token.resultHandler(event)" fault="event.token.faultHandler(event)" />
+	</fx:Declarations>
+
+	<s:states>
+		<s:State name="loading"/>
+		<s:State name="normal"/>
+		<s:State name="zeroresults"/>
+	</s:states>
+
+	<s:actionContent>
+		<s:Button label="Back" click="goBack(event)" />		
+	</s:actionContent>
+	
+	<s:layout>
+		<s:VerticalLayout horizontalAlign="center" verticalAlign="top" paddingTop="5" />
+	</s:layout>
+
+	<s:Label id="statusLabel" includeIn="loading,zeroresults" />
+	<s:List id="resultList" labelField="name"  width="100%" includeIn="normal" click="loadResult(event)" />
+
+</s:View>
