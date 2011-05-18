@@ -4,14 +4,19 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import com.adobe.serialization.json.JSON;
+			
+			import mx.rpc.AsyncToken;
 			import mx.rpc.events.FaultEvent;
 			import mx.rpc.events.ResultEvent;
+			
 			import spark.events.ViewNavigatorEvent;
-			import com.adobe.serialization.json.JSON;
-			import mx.rpc.AsyncToken;
 			
 			//Bad code Ray - don't repeat!
 			private var apiKey:String = "AIzaSyBmTswgqdK5l2WmFk7PdbLl5-E8pJ1XgMM";
+			
+			private var long:Number;
+			private var lat:Number;
 			
 			private function goBack(event:MouseEvent):void {
 				navigator.popView();
@@ -46,13 +51,21 @@
 				mapImage.source = new URLRequest("http://maps.google.com/maps/api/staticmap?center=" + resultData.result.geometry.location.lat + "," + 
 					resultData.result.geometry.location.lng + "&zoom=15&size="+mapImage.width+"x"+mapImage.height+"&maptype=roadmap" +
 					"&markers=color:red%7C" + resultData.result.geometry.location.lat + "," + resultData.result.geometry.location.lng +
-					"&sensor=false");				
+					"&sensor=false");
+				//Store long/lat for use for driving directions
+				long = resultData.result.geometry.location.lng;
+				lat = resultData.result.geometry.location.lat;
+				
 				trace("done ");	
 			}
 			
 			private function faultResult(event:FaultEvent):void {
 				trace("fault");
 				//statusLabel.text = "Sorry, we were unable to connect.";
+			}
+			
+			protected function getDrivingDirections(event:MouseEvent):void {
+				navigator.pushView(DrivingDirections,{long:long,lat:lat});
 			}
 			
 		]]>
@@ -80,6 +93,7 @@
 		<s:RichText id="phoneLabel" click="navigateToURL(new URLRequest('tel:'+phoneLabel.text))" /> 
 	</s:HGroup>
 	
+	<s:Button label="Driving Directions" width="100%" click="getDrivingDirections(event)"/>
 	<s:Image id="mapImage" width="100%" height="100%" />
 	
 </s:View>
