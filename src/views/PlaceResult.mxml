@@ -5,6 +5,14 @@
 	<fx:Script>
 		<![CDATA[
 			import com.adobe.serialization.json.JSON;
+			import com.google.maps.overlays.Marker;
+			import com.google.maps.Map;
+			import com.google.maps.MapEvent;
+			import com.google.maps.MapType;
+			import com.google.maps.LatLng;
+			import com.google.maps.styles.FillStyle;
+			import com.google.maps.styles.StrokeStyle;
+			import com.google.maps.overlays.MarkerOptions;
 			
 			import mx.rpc.AsyncToken;
 			import mx.rpc.events.FaultEvent;
@@ -17,7 +25,11 @@
 			
 			private var long:Number;
 			private var lat:Number;
+			private var mylong:Number;
+			private var mylat:Number;
 			
+			private var mapReady:Boolean = false;
+		
 			private function goBack(event:MouseEvent):void {
 				navigator.popView();
 			}
@@ -26,6 +38,8 @@
 			{
 				this.title = data.selected.name;
 				loadDetail(data.selected.reference);
+				mylong = data.mylong;
+				mylat = data.mylat;
 			}
 			
 			protected function loadDetail(reference:String):void {
@@ -41,21 +55,18 @@
 				var resultData:Object = JSON.decode(event.result.toString());
 				addressLabel.text = resultData.result.formatted_address;
 				phoneLabel.text = resultData.result.formatted_phone_number;
-				trace(mapImage.width+","+mapImage.height);
-				//figure out which is bigger and use that so we don't get squishies
 				/*
-				if(mapImage.width > mapImage.height) mapImage.width = mapImage.height;
-				else if(mapImage.height > mapImage.width) mapImage.height = mapImage.width;
-				*/
-				trace(mapImage.width+","+mapImage.height);
 				mapImage.source = new URLRequest("http://maps.google.com/maps/api/staticmap?center=" + resultData.result.geometry.location.lat + "," + 
 					resultData.result.geometry.location.lng + "&zoom=15&size="+mapImage.width+"x"+mapImage.height+"&maptype=roadmap" +
 					"&markers=color:red%7C" + resultData.result.geometry.location.lat + "," + resultData.result.geometry.location.lng +
 					"&sensor=false");
+				*/
 				//Store long/lat for use for driving directions
+				
 				long = resultData.result.geometry.location.lng;
 				lat = resultData.result.geometry.location.lat;
-				
+				//technically this could finish before mapReady - need to think
+				if(mapReady) drawMap();
 				trace("done ");	
 			}
 			
@@ -65,9 +76,26 @@
 			}
 			
 			protected function getDrivingDirections(event:MouseEvent):void {
-				navigator.pushView(DrivingDirections,{long:long,lat:lat});
+				trace("im pushing my stuff as "+mylong+" and "+mylat);
+				navigator.pushView(DrivingDirections,{long:long,lat:lat,mylong:mylong,mylat:mylat});
 			}
 			
+			protected function onMapReady(event:MapEvent):void {
+				if(lat) drawMap();
+				mapReady = true;
+			}
+			
+			protected function drawMap():void {
+				map.setCenter(new LatLng(lat,long), 16, MapType.NORMAL_MAP_TYPE);
+				var markerA:Marker = new Marker(new LatLng(lat, long),
+					new MarkerOptions({
+						strokeStyle: new StrokeStyle({color: 0x987654}),
+						fillStyle: new FillStyle({color: 0x223344, alpha: 0.8}),
+						radius: 12,
+						hasShadow: true
+					}));
+				map.addOverlay(markerA);
+			}
 		]]>
 	</fx:Script>
 	
@@ -94,6 +122,6 @@
 	</s:HGroup>
 	
 	<s:Button label="Driving Directions" width="100%" click="getDrivingDirections(event)"/>
-	<s:Image id="mapImage" width="100%" height="100%" />
+	<maps:Map xmlns:maps="com.google.maps.*" id="map" mapevent_mapready="onMapReady(event)" width="100%" height="100%" key="ABQIAAAANa2eDzLCrHnNGWxQ6nsUqBT0kcRajLdLCyGsAW6MRHnr7QX6dBTzuJkY4CKmc-3TB-8A2-9DEW3IXQ" sensor="false" url="http://coldfusionjedi.com" />
 	
 </s:View>

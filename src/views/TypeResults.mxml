@@ -3,16 +3,20 @@
 		xmlns:s="library://ns.adobe.com/flex/spark" title="{typeLabel}" viewActivate="init(event)">
 	<fx:Script>
 	<![CDATA[
-		import mx.rpc.AsyncToken;
-		import mx.rpc.events.ResultEvent;
-		import mx.rpc.events.FaultEvent;
-		import spark.events.ViewNavigatorEvent;
 		import com.adobe.serialization.json.JSON;
+		
 		import mx.collections.ArrayCollection;
+		import mx.rpc.AsyncToken;
+		import mx.rpc.events.FaultEvent;
+		import mx.rpc.events.ResultEvent;
+		
+		import spark.events.ViewNavigatorEvent;
 		
 		[Bindable] private var typeLabel:String = "";
 		private var type:String = "";
 		private var apiKey:String = "AIzaSyBmTswgqdK5l2WmFk7PdbLl5-E8pJ1XgMM";
+		private var lat:Number;
+		private var long:Number;
 		
 		private function goBack(event:MouseEvent):void {
 			navigator.popView();
@@ -21,9 +25,11 @@
 		private function init(event:ViewNavigatorEvent):void {
 			typeLabel = data.selected.label;		
 			type = data.selected.id;
-			//hard coded accuracy for now
 			statusLabel.text = "Loading results....";
-			getPlaceResults(data.lat,data.lng,1000);
+			lat = data.lat;
+			long = data.lng;
+			//hard coded accuracy for now
+			getPlaceResults(lat,long,2000);
 		}
 		
 		private function getPlaceResults(lat:Number,long:Number,accuracy:Number):void {
@@ -57,7 +63,7 @@
 		}
 
 		private function loadResult(e:Event):void {
-			navigator.pushView(PlaceResult,{selected:resultList.selectedItem});		
+			navigator.pushView(PlaceResult,{selected:resultList.selectedItem,mylat:lat,mylong:long});		
 		}
 	]]>
 	</fx:Script>

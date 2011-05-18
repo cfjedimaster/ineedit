@@ -3,10 +3,68 @@
 		xmlns:s="library://ns.adobe.com/flex/spark" title="Driving Directions" viewActivate="init(event)">
 	<fx:Script>
 		<![CDATA[
-			import spark.events.ViewNavigatorEvent;
+			import com.google.maps.LatLng;
+			import com.google.maps.services.Directions;
+			import com.google.maps.services.DirectionsEvent;
+			import com.google.maps.services.Route;
+			import com.google.maps.services.Step;
 			
+			import flash.media.StageWebView;
+			
+			import spark.events.ViewNavigatorEvent;
+
+			private function goBack(event:MouseEvent):void {
+				navigator.popView();
+			}
+
 			protected function init(event:ViewNavigatorEvent):void {
+
 				trace(data.long+","+data.lat);
+				var dir:Directions = new Directions();
+				dir.addEventListener(DirectionsEvent.DIRECTIONS_SUCCESS, onDirLoad);
+				dir.addEventListener(DirectionsEvent.DIRECTIONS_FAILURE, onDirFail);
+				
+				var waypoints:Array = [new LatLng(data.mylat,data.mylong),
+											   new LatLng(data.lat,data.long)
+												];
+				dir.loadFromWaypoints(waypoints);
+				statusLabel.text = "Loading directions...";
+			}
+			
+			protected function onDirLoad(event:DirectionsEvent):void
+			{
+				currentState="ready";
+				trace('got stuff back');
+				var directions:String = "";
+				var directionData:Directions = Directions(event.directions);
+			
+				//As before, use route 1
+				if(directionData.numRoutes >= 1) {
+					var route:Route = directionData.getRoute(0);
+					for(var i:int=0; i<route.numSteps; i++) {
+						var step:Step = route.getStep(i);
+						directions += step.descriptionHtml+ "\n";
+					}
+
+					var stageView:StageWebView = new StageWebView();
+					stageView.stage = stage;
+					stageView.viewPort = new Rectangle( 0, 0, stage.stageWidth, stage.stageHeight );
+					stageView.loadString(directions);
+				} else {
+					//A lie, but close enough
+					currentState="error";
+					statusLabel.text = "Sorry, unable to get directions.";
+					
+				}
+				
+			}
+			
+			protected function onDirFail(event:Event):void
+			{
+				currentState="error";
+				statusLabel.text = "Sorry, unable to get directions.";
+				trace('dir error');
+				
 			}
 			
 		]]>
@@ -14,4 +72,21 @@
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
+
+	<s:actionContent>
+		<s:Button label="Back" click="goBack(event)" />		
+	</s:actionContent>
+
+	<s:layout>
+		<s:VerticalLayout gap="10" />
+	</s:layout>
+
+	<s:states>
+		<s:State name="loading" />
+		<s:State name="error" />
+		<s:State name="ready" />
+	</s:states>
+
+	<s:Label id="statusLabel" includeIn="error,loading" />
+	<s:RichText id="dirBox" width="100%" height="100%" includeIn="ready" />
 </s:View>
