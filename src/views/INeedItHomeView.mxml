@@ -35,9 +35,11 @@
 				currentState = "unsupported";
 				statusLabel.text = "Geolocation is not supported on this device.";
 				//temp
+				/*
 				currentState = "normal";
 				lat=37.7823
 				lng=-122.4320;
+				*/
 			}	
 
 			//Define types
