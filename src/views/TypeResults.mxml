@@ -82,7 +82,7 @@
 	</s:actionContent>
 	
 	<s:layout>
-		<s:VerticalLayout horizontalAlign="center" verticalAlign="top" paddingTop="5" />
+		<s:VerticalLayout horizontalAlign="center" verticalAlign="top" paddingTop="5" paddingRight="5" paddingLeft="5" />
 	</s:layout>
 
 	<s:Label id="statusLabel" includeIn="loading,zeroresults" />

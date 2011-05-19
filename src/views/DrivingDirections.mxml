@@ -9,12 +9,11 @@
 			import com.google.maps.services.Route;
 			import com.google.maps.services.Step;
 			
-			import flash.media.StageWebView;
-			
 			import spark.events.ViewNavigatorEvent;
 
 			private function goBack(event:MouseEvent):void {
 				navigator.popView();
+				//hollyschinsky@gmail.com
 			}
 
 			protected function init(event:ViewNavigatorEvent):void {
@@ -43,13 +42,13 @@
 					var route:Route = directionData.getRoute(0);
 					for(var i:int=0; i<route.numSteps; i++) {
 						var step:Step = route.getStep(i);
-						directions += step.descriptionHtml+ "\n";
+						var html:String = step.descriptionHtml;
+						html = html.replace(/<div class="google_note">/g,"\n\n");
+						directions += html.replace(/<.*?>/g,"") + "\n\n";
 					}
-
-					var stageView:StageWebView = new StageWebView();
-					stageView.stage = stage;
-					stageView.viewPort = new Rectangle( 0, 0, stage.stageWidth, stage.stageHeight );
-					stageView.loadString(directions);
+					trace(directions);
+					dirBox.text = directions;
+					
 				} else {
 					//A lie, but close enough
 					currentState="error";
@@ -78,7 +77,7 @@
 	</s:actionContent>
 
 	<s:layout>
-		<s:VerticalLayout gap="10" />
+		<s:VerticalLayout gap="5" paddingTop="5" paddingLeft="5" paddingRight="5"/>
 	</s:layout>
 
 	<s:states>
@@ -88,5 +87,5 @@
 	</s:states>
 
 	<s:Label id="statusLabel" includeIn="error,loading" />
-	<s:RichText id="dirBox" width="100%" height="100%" includeIn="ready" />
+	<s:Label id="dirBox" width="100%" height="100%" includeIn="ready" />
 </s:View>
