@@ -1,2 +1,1 @@
-/bin-debug/*.swf
-/bin-debug/*.xml
+bin-debug/*.*
