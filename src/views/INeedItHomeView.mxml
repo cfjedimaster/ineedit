@@ -16,6 +16,11 @@
 		private var g:Geolocation = new Geolocation();    
 		[Bindable] private var types:ArrayCollection;
 		
+
+		[Embed(source="assets/google.png")]
+		[Bindable]
+		public var imgGoogle:Class;
+		
 		private function init(event:ViewNavigatorEvent):void {
 			
 			//First fire off GPS
@@ -179,6 +184,7 @@
 	</s:layout>
 
 	<s:Label id="statusLabel" includeIn="unsupported,loading" />
+	<s:Image id="googleImage" source="{imgGoogle}" />
 	<s:List id="typeList" dataProvider="{types}" labelField="label"  width="100%" height="100%" click="loadType(event)" includeIn="normal"  />
 
 </s:View>
